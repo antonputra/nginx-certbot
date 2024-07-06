@@ -1,0 +1,78 @@
+---
+services:
+
+  nginx:
+    image: nginx:1.22.1
+    ports:
+    - 80:80
+    volumes:
+    - ./nginx.conf:/etc/nginx/nginx.conf
+    - ./grafana.conf:/etc/nginx/conf.d/default.conf
+
+  my-grafana:
+    image: grafana/grafana:11.1.0
+    ports:
+      - 3000:3000
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=devops123
+    volumes:
+      - grafana:/var/lib/grafana
+
+  # postgres:
+  #   image: postgres:13-alpine
+  #   restart: unless-stopped
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   pids_limit: 100
+  #   read_only: true
+  #   tmpfs:
+  #     - /tmp
+  #     - /var/run/postgresql
+  #   volumes:
+  #     - ./volumes/db/var/lib/postgresql/data:/var/lib/postgresql/data
+  #   environment:
+  #     # timezone inside container
+  #     - TZ=UTC
+  #     - POSTGRES_USER=mmuser
+  #     - POSTGRES_PASSWORD=mmuser_password
+  #     - POSTGRES_DB=mattermost
+
+  # mattermost:
+  #   depends_on:
+  #     - postgres
+  #   image: mattermost/mattermost-team-edition:8.1.9
+  #   restart: unless-stopped
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   pids_limit: 200
+  #   read_only: false
+  #   tmpfs:
+  #     - /tmp
+  #   volumes:
+  #     - ./volumes/app/mattermost/config:/mattermost/config:rw
+  #     - ./volumes/app/mattermost/data:/mattermost/data:rw
+  #     - ./volumes/app/mattermost/logs:/mattermost/logs:rw
+  #     - ./volumes/app/mattermost/plugins:/mattermost/plugins:rw
+  #     - ./volumes/app/mattermost/client/plugins:/mattermost/client/plugins:rw
+  #     - ./volumes/app/mattermost/bleve-indexes:/mattermost/bleve-indexes:rw
+  #     # When you want to use SSO with GitLab, you have to add the cert pki chain of GitLab inside Alpine
+  #     # to avoid Token request failed: certificate signed by unknown authority 
+  #     # (link: https://github.com/mattermost/mattermost-server/issues/13059 and https://github.com/mattermost/docker/issues/34)
+  #     # - ${GITLAB_PKI_CHAIN_PATH}:/etc/ssl/certs/pki_chain.pem:ro
+  #   environment:
+  #     # timezone inside container
+  #     - TZ=UTC
+
+  #     # necessary Mattermost options/variables (see env.example)
+  #     - MM_SQLSETTINGS_DRIVERNAME=postgres
+  #     - MM_SQLSETTINGS_DATASOURCE=postgres://mmuser:mmuser_password@postgres:5432/mattermost?sslmode=disable&connect_timeout=10
+
+  #     # necessary for bleve
+  #     - MM_BLEVESETTINGS_INDEXDIR=/mattermost/bleve-indexes
+
+  #     # additional settings
+  #     - MM_SERVICESETTINGS_SITEURL=https://mm.example.com
+
+volumes:
+  grafana:
