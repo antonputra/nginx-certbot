@@ -17,8 +17,9 @@ services:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=devops123
     volumes:
+      - ./grafana.ini:/etc/grafana/grafana.ini
       - grafana:/var/lib/grafana
-
+      
   # postgres:
   #   image: postgres:13-alpine
   #   restart: unless-stopped
