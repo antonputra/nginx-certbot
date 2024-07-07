@@ -13,7 +13,7 @@ services:
       - 443:443
     volumes:                                    # Storage can be either a
       - nginx_secrets:/etc/letsencrypt          # Docker managed volume (see list at the bottom)
-      - ./grafana.conf:/etc/nginx/conf.d/grafana.conf
+      - ./user_conf.d:/etc/nginx/user_conf.d 
 
   # nginx:
   #   image: nginx:1.22.1
