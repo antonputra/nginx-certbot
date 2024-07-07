@@ -11,17 +11,9 @@ services:
     ports:
       - 80:80
       - 443:443
-    volumes:                                    # Storage can be either a
-      - nginx_secrets:/etc/letsencrypt          # Docker managed volume (see list at the bottom)
+    volumes:
+      - nginx_secrets:/etc/letsencrypt
       - ./user_conf.d:/etc/nginx/user_conf.d 
-
-  # nginx:
-  #   image: nginx:1.22.1
-  #   ports:
-  #   - 80:80
-  #   volumes:
-  #   - ./nginx.conf:/etc/nginx/nginx.conf
-  #   - ./grafana.conf:/etc/nginx/conf.d/default.conf
 
   my-grafana:
     image: grafana/grafana:11.1.0
