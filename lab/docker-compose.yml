@@ -8,6 +8,8 @@ services:
       - CERTBOT_EMAIL
     env_file:
       - ./nginx-certbot.env
+    networks:
+      - mattermost
     ports:
       - 80:80
       - 443:443
@@ -17,33 +19,44 @@ services:
 
   my-grafana:
     image: grafana/grafana:11.1.0
-    ports:
-      - 3000:3000
+    networks:
+      - mattermost
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=devops123
     volumes:
       - ./grafana.ini:/etc/grafana/grafana.ini
       - grafana:/var/lib/grafana
-      
-  # postgres:
-  #   image: postgres:13-alpine
-  #   restart: unless-stopped
-  #   security_opt:
-  #     - no-new-privileges:true
-  #   pids_limit: 100
-  #   read_only: true
-  #   tmpfs:
-  #     - /tmp
-  #     - /var/run/postgresql
-  #   volumes:
-  #     - ./volumes/db/var/lib/postgresql/data:/var/lib/postgresql/data
-  #   environment:
-  #     # timezone inside container
-  #     - TZ=UTC
-  #     - POSTGRES_USER=mmuser
-  #     - POSTGRES_PASSWORD=mmuser_password
-  #     - POSTGRES_DB=mattermost
+
+  my-prometheus:
+    image: prom/prometheus:v2.53.0
+    networks:
+      - mattermost
+    ports:
+      - 9090:9090
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+
+  postgres:
+    image: postgres:13-alpine
+    restart: unless-stopped
+    networks:
+      - mattermost
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 100
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/run/postgresql
+    volumes:
+      - ./volumes/db/var/lib/postgresql/data:/var/lib/postgresql/data
+    environment:
+      # timezone inside container
+      - TZ=UTC
+      - POSTGRES_USER=mmuser
+      - POSTGRES_PASSWORD=mmuser_password
+      - POSTGRES_DB=mattermost
 
   # mattermost:
   #   depends_on:
@@ -84,3 +97,6 @@ services:
 volumes:
   grafana:
   nginx_secrets:
+
+networks:
+  mattermost:
