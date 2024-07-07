@@ -2,12 +2,26 @@
 services:
 
   nginx:
-    image: nginx:1.22.1
+    image: jonasal/nginx-certbot:5.2.1-nginx1.27.0
+    restart: unless-stopped
+    environment:
+      - CERTBOT_EMAIL
+    env_file:
+      - ./nginx-certbot.env
     ports:
-    - 80:80
-    volumes:
-    - ./nginx.conf:/etc/nginx/nginx.conf
-    - ./grafana.conf:/etc/nginx/conf.d/default.conf
+      - 80:80
+      - 443:443
+    volumes:                                    # Storage can be either a
+      - nginx_secrets:/etc/letsencrypt          # Docker managed volume (see list at the bottom)
+      - ./grafana.conf:/etc/nginx/conf.d/grafana.conf
+
+  # nginx:
+  #   image: nginx:1.22.1
+  #   ports:
+  #   - 80:80
+  #   volumes:
+  #   - ./nginx.conf:/etc/nginx/nginx.conf
+  #   - ./grafana.conf:/etc/nginx/conf.d/default.conf
 
   my-grafana:
     image: grafana/grafana:11.1.0
@@ -77,3 +91,4 @@ services:
 
 volumes:
   grafana:
+  nginx_secrets:
